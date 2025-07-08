@@ -18,7 +18,7 @@ export class LoginDoctoresComponent {
   iniciarSesion() {
     if (this.usuario === 'doctor' && this.password === '12345') {
       alert('Inicio de sesión exitoso');
-      this.router.navigate(['/home']);
+      this.router.navigate(['Portal-doctor']);
     } else {
       alert('Usuario o contraseña incorrectos');
     }
