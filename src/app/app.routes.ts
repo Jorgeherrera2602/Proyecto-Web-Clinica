@@ -13,6 +13,7 @@ import { FooterComponent } from './pages/compartido/footer/footer.component';
 import { SearchbarComponent } from './pages/searchbar/searchbar.component';
 import { BlogSaludComponent } from './pages/blog-salud/blog-salud.component'; 
 import { ServiciosComponent } from './pages/servicios/servicios.component';
+import { PortaldoctorComponent} from './pages/Portaldoctor/Portaldoctor.component';
 
 export const routes: Routes = [
     {
@@ -30,6 +31,10 @@ export const routes: Routes = [
     },{
         path: 'DashBoardPaciente',
         component: DashBoardPacienteComponent
+    },{
+        path: 'Portal-doctor',
+        component: PortaldoctorComponent
+
     },{
         path:'cita',
         component: CitaComponent
