@@ -40,7 +40,7 @@ export class LoginPacienteComponent {
     const usuario = this.usuariosRegistrados.find(user => user.email === this.email && user.password === this.password);
     if (usuario) {
       alert('Inicio de sesión exitoso');
-      this.router.navigate(['/home']);
+      this.router.navigate(['/DashBoardPaciente']);
     } else {
       alert('Correo o contraseña incorrectos');
     }

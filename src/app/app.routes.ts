@@ -8,6 +8,7 @@ import { EspecialidadesComponent }  from './pages/especialidades/especialidades.
 import { LoginDoctoresComponent } from './pages/autenticacion/login-doctores/login-doctores.component';
 import { LoginPacienteComponent } from './pages/autenticacion/login-paciente/login-paciente.component';
 import { CitaComponent } from './pages/compartido/cita/cita.component';
+import { DashBoardPacienteComponent } from './pages/DashBoardPaciente/DashBoardPaciente.component';
 import { FooterComponent } from './pages/compartido/footer/footer.component';
 import { SearchbarComponent } from './pages/searchbar/searchbar.component';
 import { BlogSaludComponent } from './pages/blog-salud/blog-salud.component'; 
@@ -26,6 +27,9 @@ export const routes: Routes = [
     }, {
         path: 'login-doctores',
         component: LoginDoctoresComponent
+    },{
+        path: 'DashBoardPaciente',
+        component: DashBoardPacienteComponent
     },{
         path:'cita',
         component: CitaComponent
