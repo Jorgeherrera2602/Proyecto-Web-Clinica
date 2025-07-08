@@ -35,12 +35,17 @@
 
   <!-- Lista de doctores filtrada -->
   <div class="lista-doctores">
-    <div class="doctor" *ngFor="let doctor of doctoresFiltrados">
-      <h3>{{ doctor.nombre }}</h3>
-      <p><strong>Especialidad:</strong> {{ doctor.especialidad }}</p>
-      <button class="btn-horario">Horario</button>
+  <div class="doctor" *ngFor="let doctor of doctoresFiltrados">
+    <div class="contenido-doctor">
+      <img class="foto-doctor" [src]="doctor.fotoUrl" alt="Foto de {{ doctor.nombre }}" />
+      <div class="info-doctor">
+        <h3>{{ doctor.nombre }}</h3>
+        <p><strong>CMP:</strong> {{ doctor.cmp }}</p>
+        <p><strong>Especialidad:</strong> {{ doctor.especialidad }}</p>
+      </div>
     </div>
   </div>
+</div>
 
 </div>
   <app-footer></app-footer>
