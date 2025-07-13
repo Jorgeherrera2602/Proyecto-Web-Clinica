@@ -7,7 +7,10 @@ import { DoctoresComponent }  from './pages/doctores/doctores.component';
 import { EspecialidadesComponent }  from './pages/especialidades/especialidades.component';
 import { LoginDoctoresComponent } from './pages/autenticacion/login-doctores/login-doctores.component';
 import { LoginPacienteComponent } from './pages/autenticacion/login-paciente/login-paciente.component';
+import { LoginAdminComponent } from './pages/autenticacion/login-admin/login-admin.component';
 import { CitaComponent } from './pages/compartido/cita/cita.component';
+import { DashBoardPacienteComponent } from './pages/DashBoardPaciente/DashBoardPaciente.component';
+import { DashBoardAdminComponent } from './pages/DashBoardAdmin/DashBoardAdmin.component';
 import { FooterComponent } from './pages/compartido/footer/footer.component';
 import { SearchbarComponent } from './pages/searchbar/searchbar.component';
 import { BlogSaludComponent } from './pages/blog-salud/blog-salud.component'; 
@@ -28,8 +31,18 @@ export const routes: Routes = [
         path: 'login-doctores',
         component: LoginDoctoresComponent
     },{
+        path: 'login-admin',
+        component: LoginAdminComponent
+    },{
+        path: 'DashBoardPaciente',
+        component: DashBoardPacienteComponent
+    },{
+        path: 'DashBoardAdmin',
+        component: DashBoardAdminComponent
+    },{
         path: 'Portal-doctor',
         component: PortaldoctorComponent
+
     },{
         path:'cita',
         component: CitaComponent

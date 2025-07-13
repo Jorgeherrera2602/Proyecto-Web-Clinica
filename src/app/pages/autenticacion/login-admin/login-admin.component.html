@@ -1,0 +1,42 @@
+<div class="relative min-h-screen bg-gradient-to-br from-purple-200 to-purple-400 flex items-center justify-center px-4">
+    <div class="absolute top-6 right-6">
+    <a href="/" class="bg-white text-[#5B4892] font-semibold px-4 py-2 rounded-xl shadow hover:bg-gray-100 transition duration-300">
+      ← Regresar a inicio
+    </a>
+    </div>
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+    <h2 class="text-3xl font-bold text-center text-[#5B4892] mb-6">Portal Administrador</h2>
+    <form (ngSubmit)="iniciarSesion()" class="space-y-5">
+    <div>
+        <label for="usuario" class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+        <input
+        type="text"
+        id="usuario"
+        name="usuario"
+        [(ngModel)]="usuario"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5B4892]"
+        required
+        />
+    </div>
+
+    <div>
+        <label for="contraseña" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+        <input
+        type="password"
+        id="contraseña"
+        name="contraseña"
+        [(ngModel)]="password"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5B4892]"
+        required/>
+    </div>
+
+    <div *ngIf="error" class="text-center text-sm text-red-600">{{ error }}</div>
+
+    <button
+        type="submit"
+        class="w-full bg-[#5B4892] hover:bg-[#473772] text-white font-semibold py-2 rounded-lg transition duration-300">
+        Iniciar Sesión
+    </button>
+    </form>
+    </div>
+</div>
