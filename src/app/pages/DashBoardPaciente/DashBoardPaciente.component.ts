@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLinkWithHref } from '@angular/router';
 
 @Component({
-  selector: 'app-dashboard-paciente',
+  selector: 'app-DashBoardPaciente',
   standalone: true,
-  imports: [CommonModule,RouterLinkWithHref],
+  imports: [CommonModule],
   templateUrl: './DashBoardPaciente.component.html',
   styleUrls: ['./DashBoardPaciente.component.css']
 })
 export class DashBoardPacienteComponent implements OnInit {
+  
   
   especialidades = [
     { nombre: 'Cardiología', doctores: ['Dr. Felipe Quispe'] },
@@ -41,15 +41,28 @@ export class DashBoardPacienteComponent implements OnInit {
   diasDelMes: string[] = [];
   nombreMes = 'Julio';
 
+  emailPaciente: string = '';
   ngOnInit(): void {
-    const year = 2025;
-    const month = 6; 
+  const email = localStorage.getItem('usuarioActivo');
+  if (email) {
+    this.emailPaciente = email;
+    console.log('Email activo:', this.emailPaciente);
+    const citasGuardadas = localStorage.getItem(`citas_${email}`);
+    if (citasGuardadas) {
+      this.citas = JSON.parse(citasGuardadas);
+    }
     const daysInMonth = 31;
     this.diasDelMes = Array.from({ length: daysInMonth }, (_, i) => {
       const day = (i + 1).toString().padStart(2, '0');
-      return `${year}-07-${day}`;
+      return `2025-07-${day}`;
     });
   }
+}
+
+  guardarCitasEnLocalStorage() {
+  localStorage.setItem(`citas_${this.emailPaciente}`, JSON.stringify(this.citas));
+}
+
 
   seleccionarEspecialidad(nombre: string) {
     this.especialidadSeleccionada = nombre;
@@ -124,14 +137,16 @@ export class DashBoardPacienteComponent implements OnInit {
   }
 
   actualizarHorariosReservados() {
-    if (this.diaSeleccionado && this.doctorSeleccionado) {
-      this.horariosReservados = this.citas
-        .filter(c => c.dia === this.diaSeleccionado && c.doctor === this.doctorSeleccionado)
-        .map(c => c.horario);
-    } else {
-      this.horariosReservados = [];
-    }
+  if (this.diaSeleccionado && this.doctorSeleccionado) {
+    const todasLasCitas = this.obtenerTodasLasCitas();
+    this.horariosReservados = todasLasCitas
+      .filter(c => c.dia === this.diaSeleccionado && c.doctor === this.doctorSeleccionado)
+      .map(c => c.horario);
+  } else {
+    this.horariosReservados = [];
   }
+}
+
 
   seleccionarDia(dia: string) {
     this.diaSeleccionado = dia;
@@ -143,6 +158,8 @@ export class DashBoardPacienteComponent implements OnInit {
       const horarioEl = document.getElementById('horarios');
       horarioEl?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
+    this.diaSeleccionado = dia;
+    this.actualizarHorariosReservados();
   }
 
 
@@ -155,15 +172,8 @@ export class DashBoardPacienteComponent implements OnInit {
       this.advertenciaActiva = true;
       return;
     }
-
-    const yaTieneCita = this.citas.some(c => c.doctor === this.doctorSeleccionado);
-    if (yaTieneCita) {
-      this.mensajeAdvertencia = 'Ya tienes una cita reservada con este doctor.';
-      this.advertenciaActiva = true;
-      return;
-    }
-    this.horarioSeleccionado = horario;
-    this.mostrarModal = true;
+      this.horarioSeleccionado = horario;
+      this.mostrarModal = true;
   }
   cerrarAdvertencia() {
     this.advertenciaActiva = false;
@@ -179,6 +189,7 @@ export class DashBoardPacienteComponent implements OnInit {
         doctor: this.doctorSeleccionado,
         especialidad: this.especialidadSeleccionada
       });
+      this.guardarCitasEnLocalStorage();
     }
     this.mostrarModal = false;
   }
@@ -191,6 +202,7 @@ export class DashBoardPacienteComponent implements OnInit {
   eliminarCita(index: number) {
     const cita = this.citas[index];
     this.citas.splice(index, 1);
+    this.guardarCitasEnLocalStorage();
     if (cita.dia === this.diaSeleccionado && cita.doctor === this.doctorSeleccionado) {
       this.actualizarHorariosReservados();
     }
@@ -201,5 +213,25 @@ export class DashBoardPacienteComponent implements OnInit {
     const fechaB = new Date(`${b.dia} ${b.horario.split(' - ')[0]}`);
     return fechaA.getTime() - fechaB.getTime();
   });
+}
+  cerrarSesion() {
+    localStorage.removeItem('usuarioActivo');
+    window.location.href = '/login-paciente';
+  }
+  obtenerTodasLasCitas(): { dia: string; horario: string; doctor: string; especialidad: string }[] {
+  const datos = localStorage.getItem('usuariosRegistrados');
+  const todas: { dia: string; horario: string; doctor: string; especialidad: string }[] = [];
+
+  if (datos) {
+    const usuarios = JSON.parse(datos);
+    for (const usuario of usuarios) {
+      const citasUsuario = localStorage.getItem(`citas_${usuario.email}`);
+      if (citasUsuario) {
+        const citas = JSON.parse(citasUsuario);
+        todas.push(...citas);
+      }
+    }
+  }
+  return todas;
 }
 }
