@@ -49,7 +49,7 @@
           </button>
         </div>
       </div>
-      
+
       <!-- Calendario -->
       <div *ngIf="diasDelMes.length > 0">
         <div class="flex items-center justify-between mb-2">
@@ -76,7 +76,7 @@
       <div *ngIf="diaSeleccionado">
         <h2 class="text-lg font-semibold text-[#5B4892] mb-2">Horarios para {{ diaSeleccionado }}</h2>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          <div *ngFor="let h of horarios"
+          <div *ngFor="let h of horariosDelDia"
                (click)="seleccionarHorario(h)"
                class="p-2 text-center rounded-xl cursor-pointer transition border"
                [ngClass]="{
@@ -90,7 +90,6 @@
       </div>
     </div>
   </div>
-
   <!-- Modal -->
   <div *ngIf="mostrarModal" class="fixed inset-0 backdrop-blur-md bg-white/30 flex items-center justify-center z-50">
     <div class="bg-white p-6 rounded-xl shadow-xl w-96">
@@ -104,6 +103,17 @@
       </div>
     </div>
   </div>
+<div *ngIf="advertenciaActiva" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+  <strong class="font-bold">¡Atención!</strong>
+  <span class="block sm:inline">{{ mensajeAdvertencia }}</span>
+  <span class="absolute top-0 bottom-0 right-0 px-4 py-3" (click)="cerrarAdvertencia()">
+    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+      <title>Cerrar</title>
+      <path d="M14.348 5.652a1 1 0 010 1.414L11.414 10l2.934 2.934a1 1 0 01-1.414 1.414L10 11.414l-2.934 2.934a1 1 0 01-1.414-1.414L8.586 10 5.652 7.066a1 1 0 011.414-1.414L10 8.586l2.934-2.934a1 1 0 011.414 0z"/>
+    </svg>
+  </span>
+</div>
+
 <div *ngIf="advertenciaActiva" class="fixed inset-0 backdrop-blur-md bg-white/30 flex items-center justify-center z-50">
   <div class="bg-white p-6 rounded-xl shadow-xl w-96 text-center">
     <h3 class="text-xl font-bold text-red-600 mb-3">Advertencia</h3>

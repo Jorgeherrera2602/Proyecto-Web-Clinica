@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 export class DashBoardPacienteComponent implements OnInit {
   
   espaciosInicioJulio: undefined[] = [];
+  horariosDelDia: string[] = [];
 
   especialidades = [
     { nombre: 'Cardiología', doctores: ['Dr. Felipe Quispe'] },
@@ -121,18 +122,26 @@ export class DashBoardPacienteComponent implements OnInit {
 
 
   seleccionarDia(dia: string) {
-    this.diaSeleccionado = dia;
+  this.diaSeleccionado = dia;
+    const diaNum = Number(dia.split('-')[2]);
+    const data = localStorage.getItem(`horarioDoctorJulio_${this.doctorSeleccionado}`);
+    if (data) {
+      const disponibilidad = JSON.parse(data);
+      const horariosDia = disponibilidad[diaNum];
+      this.horariosDelDia = Object.keys(horariosDia).filter(h => horariosDia[h]);
+    } else {
+      this.horariosDelDia = [];
+    }
     this.horariosReservados = this.citas
       .filter(c => c.dia === dia && c.doctor === this.doctorSeleccionado)
       .map(c => c.horario);
-
     setTimeout(() => {
       const horarioEl = document.getElementById('horarios');
       horarioEl?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
-    this.diaSeleccionado = dia;
     this.actualizarHorariosReservados();
-  }
+}
+
 
 
   advertenciaActiva = false;
@@ -153,18 +162,28 @@ export class DashBoardPacienteComponent implements OnInit {
   }
 
   confirmarReserva() {
-    if (!this.horariosReservados.includes(this.horarioSeleccionado)) {
-      this.horariosReservados.push(this.horarioSeleccionado);
-      this.citas.push({
-        dia: this.diaSeleccionado,
-        horario: this.horarioSeleccionado,
-        doctor: this.doctorSeleccionado,
-        especialidad: this.especialidadSeleccionada
-      });
-      this.guardarCitasEnLocalStorage();
-    }
+  const yaTieneCitaEseDia = this.citas.some(c => c.dia === this.diaSeleccionado);
+
+  if (yaTieneCitaEseDia) {
+    this.mensajeAdvertencia = 'Ya tienes una cita registrada en este día.';
+    this.advertenciaActiva = true;
     this.mostrarModal = false;
+    return;
   }
+  if (!this.horariosReservados.includes(this.horarioSeleccionado)) {
+    this.horariosReservados.push(this.horarioSeleccionado);
+    this.citas.push({
+      dia: this.diaSeleccionado,
+      horario: this.horarioSeleccionado,
+      doctor: this.doctorSeleccionado,
+      especialidad: this.especialidadSeleccionada
+    });
+    this.guardarCitasEnLocalStorage();
+  }
+
+  this.mostrarModal = false;
+}
+
 
   cancelarReserva() {
     this.horarioSeleccionado = '';

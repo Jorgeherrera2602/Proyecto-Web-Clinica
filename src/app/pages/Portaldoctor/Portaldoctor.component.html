@@ -53,10 +53,12 @@
         <tr *ngFor="let hora of horariosMediaHora">
           <td class="p-2 border text-left pl-4">{{ hora }}</td>
           <td class="p-2 border">
-            <input type="checkbox"
-                   [(ngModel)]="horarioSeleccionado[diaSeleccionado][hora]"
-                   (change)="actualizarAlCambiarCheckbox(diaSeleccionado, hora)"
-                   class="accent-green-500">
+            <input 
+              type="checkbox" 
+              [checked]="horarioSeleccionado[diaSeleccionado][hora]" 
+              (change)="horarioSeleccionado[diaSeleccionado][hora] = !horarioSeleccionado[diaSeleccionado][hora]; actualizarAlCambiarCheckbox(diaSeleccionado!, hora)" 
+              [disabled]="esHorarioReservado(diaSeleccionado!, hora)"/>
+
           </td>
         </tr>
       </tbody>
