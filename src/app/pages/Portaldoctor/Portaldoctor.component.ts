@@ -1,77 +1,174 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLinkWithHref } from '@angular/router';
 
 @Component({
-  selector: 'app-blog-salud',
+  selector: 'app-Portaldoctor',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLinkWithHref],
+  imports: [CommonModule, FormsModule],
   templateUrl: './Portaldoctor.Component.html',
   styleUrls: ['./Portaldoctor.Component.css']
 })
 export class PortaldoctorComponent {
-  dias: string[] = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-  horas: string[] = [
-    '08:00 - 09:00',
-    '09:00 - 10:00',
-    '10:00 - 11:00',
-    '11:00 - 12:00',
-    '12:00 - 13:00',
-    '14:00 - 15:00',
-    '15:00 - 16:00',
-    '16:00 - 17:00'
-  ];
+  mostrarModal: boolean = false;
+  diasSemana: string[] = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+  diasJulio: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
+  espaciosInicio: undefined[] = Array(2);
 
-  horarioSeleccionado: { [dia: string]: { [hora: string]: boolean } } = {};
-  modoEdicion: boolean = false; // Por defecto en solo lectura
+  horariosMediaHora: string[] = [];
+  diaSeleccionado: number | null = null;
+  horarioSeleccionado: { [dia: number]: { [hora: string]: boolean } } = {};
+
+  doctorActivo: string = '';
+  especialidadDoctor: string = '';
+  citasPorAtender: { paciente: string; dia: string; hora: string; especialidad: string }[] = [];
 
   constructor() {
-    this.inicializarHorario();
+    this.doctorActivo = localStorage.getItem('doctorActivo') || '';
+    this.especialidadDoctor = this.obtenerEspecialidadDoctor(this.doctorActivo);
+    this.generarHorariosMediaHora();
+    this.cargarHorarioGuardado();
+    this.cargarCitas();
   }
 
-  inicializarHorario() {
-    const datosGuardados = localStorage.getItem('horarioDoctor');
-    if (datosGuardados) {
-      this.horarioSeleccionado = JSON.parse(datosGuardados);
-    } else {
-      this.dias.forEach(dia => {
-        this.horarioSeleccionado[dia] = {};
-        this.horas.forEach(hora => {
-          this.horarioSeleccionado[dia][hora] = false;
-        });
-      });
+  obtenerEspecialidadDoctor(nombre: string): string {
+    const especialidades = [
+      { nombre: 'Cardiología', doctores: ['Dr. Felipe Quispe'] },
+      { nombre: 'Pediatría', doctores: ['Dra. Ana Torres'] },
+      { nombre: 'Medicina Interna', doctores: ['Dr. Beto Suárez'] },
+      { nombre: 'Urología', doctores: ['Dr. Carlos Mendoza'] },
+      { nombre: 'Psicología', doctores: ['Dra. Diana López'] },
+      { nombre: 'Endocrinologia', doctores: ['Dra. Elena Chávez'] },
+      { nombre: 'Hematología', doctores: ['Dr. Rolando Soriano'] },
+      { nombre: 'Otorrinolaringología', doctores: ['Dr. Jorge Herrera'] },
+      { nombre: 'Dermatología', doctores: ['Dr. Ariano Cuellar'] },
+      { nombre: 'Neumología', doctores: ['Dr. Aldo Alanya'] },
+      { nombre: 'Nutrición', doctores: ['Dr. Edson Sosa'] }
+    ];
+    return especialidades.find(e => e.doctores.includes(nombre))?.nombre || '';
+  }
+
+  generarHorariosMediaHora() {
+    const inicio = 8 * 60;
+    const fin = 17 * 60;
+    for (let i = inicio; i < fin; i += 30) {
+      const h1 = Math.floor(i / 60);
+      const m1 = i % 60;
+      const h2 = Math.floor((i + 30) / 60);
+      const m2 = (i + 30) % 60;
+      this.horariosMediaHora.push(
+        `${this.formatoHora(h1)}:${this.formatoHora(m1)} - ${this.formatoHora(h2)}:${this.formatoHora(m2)}`
+      );
     }
   }
 
-  guardarHorarioGeneral() {
-    localStorage.setItem('horarioDoctor', JSON.stringify(this.horarioSeleccionado));
-    alert('Horario general guardado correctamente.');
+  formatoHora(num: number): string {
+    return num.toString().padStart(2, '0');
   }
 
-  resetHorario() {
-    if (confirm('¿Estás seguro de que deseas borrar todo el horario?')) {
-      this.dias.forEach(dia => {
-        this.horas.forEach(hora => {
-          this.horarioSeleccionado[dia][hora] = false;
-        });
-      });
-      localStorage.removeItem('horarioDoctor');
-    }
-  }
-
-  seleccionarTodo(dia: string) {
-    this.horas.forEach(hora => {
-      this.horarioSeleccionado[dia][hora] = true;
-    });
-  }
-
-  limpiarDia(dia: string) {
-    this.horas.forEach(hora => {
+  inicializarDia(dia: number) {
+    this.horarioSeleccionado[dia] = {};
+    this.horariosMediaHora.forEach(hora => {
       this.horarioSeleccionado[dia][hora] = false;
     });
   }
+
+  cargarHorarioGuardado() {
+    const guardado = localStorage.getItem(`horarioDoctorJulio_${this.doctorActivo}`);
+    if (guardado) {
+      this.horarioSeleccionado = JSON.parse(guardado);
+    }
+  }
+
+  seleccionarDia(dia: number) {
+    this.diaSeleccionado = dia;
+
+    if (!this.horarioSeleccionado[dia]) {
+      this.inicializarDia(dia);
+    } else {
+      const valores = Object.values(this.horarioSeleccionado[dia]);
+      if (valores.length === 0) {
+        this.inicializarDia(dia);
+      }
+    }
+  }
+
+  guardarHorarios() {
+    for (const dia of Object.keys(this.horarioSeleccionado)) {
+      const numDia = parseInt(dia);
+      const horarios = this.horarioSeleccionado[numDia];
+      const algunoMarcado = Object.values(horarios).some(v => v);
+      if (!algunoMarcado) {
+        delete this.horarioSeleccionado[numDia];
+      }
+    }
+
+    localStorage.setItem(`horarioDoctorJulio_${this.doctorActivo}`, JSON.stringify(this.horarioSeleccionado));
+    this.mostrarModal = true;
+    this.diaSeleccionado = null;
+  }
+
+  cerrarModal() {
+    this.mostrarModal = false;
+  }
+
+  actualizarAlCambiarCheckbox(dia: number, hora: string) {
+  if (this.horarioSeleccionado[dia]) {
+const todosDesmarcados = Object.values(this.horarioSeleccionado[dia]).every(val => !val);
+
+if (todosDesmarcados) {
+  delete this.horarioSeleccionado[dia];
 }
 
+localStorage.setItem(`horarioDoctorJulio_${this.doctorActivo}`, JSON.stringify(this.horarioSeleccionado));
+}
+}
 
+  tieneHorario(dia: number): boolean {
+    return !!this.horarioSeleccionado[dia] &&
+           Object.values(this.horarioSeleccionado[dia]).some(val => val === true);
+  }
+
+  cargarCitas() {
+    const datos = localStorage.getItem('usuariosRegistrados');
+    const doctor = this.doctorActivo;
+    const citas: { paciente: string; dia: string; hora: string; especialidad: string }[] = [];
+
+    if (datos) {
+      const usuarios = JSON.parse(datos);
+      for (const usuario of usuarios) {
+        const citasUsuario = localStorage.getItem(`citas_${usuario.email}`);
+        if (citasUsuario) {
+          const citasJSON = JSON.parse(citasUsuario);
+          citasJSON.forEach((c: any) => {
+            if (c.doctor === doctor) {
+              citas.push({
+                paciente: usuario.nombre || usuario.email,
+                dia: c.dia,
+                hora: c.horario,
+                especialidad: c.especialidad
+              });
+            }
+          });
+        }
+      }
+    }
+
+    this.citasPorAtender = citas;
+    this.ordenarCitas();
+  }
+
+  ordenarCitas() {
+    this.citasPorAtender.sort((a, b) => {
+      const fechaA = new Date(`${a.dia} ${a.hora.split(' - ')[0]}`);
+      const fechaB = new Date(`${b.dia} ${b.hora.split(' - ')[0]}`);
+      return fechaA.getTime() - fechaB.getTime();
+    });
+  }
+
+  cerrarSesion() {
+    localStorage.removeItem('usuarioActivo');
+    window.location.href = '/login-paciente';
+  }
+}
 

@@ -1,68 +1,88 @@
 <div class="min-h-screen bg-gradient-to-tr from-indigo-100 via-purple-100 to-pink-100 p-6">
-  <!-- Perfil del Doctor -->
-  <div class="flex items-center space-x-4 mb-6">
-    <img src="assets/logo.png" alt="perfil" class="w-20 h-20 rounded-full border-2 border-purple-600" />
-    <div>
-      <h2 class="text-xl font-bold text-gray-800">Dr. Juan Pérez</h2>
-      <p class="text-sm text-gray-600">juan.perez&#64;clinicaficticia.com</p>
+  <!-- Info Doctor -->
+  <div class="mb-4">
+    <h1 class="text-3xl font-bold text-center text-purple-800 mb-4">Portal de Doctores</h1>
+    <h2 class="text-xl text-center text-gray-700 mb-4">{{ doctorActivo }}</h2>
+    <p class="text-xl text-center text-gray-700 mb-4">{{ especialidadDoctor }}</p>
+
+  </div>
+
+  <!-- Citas por Atender -->
+  <section class="mt-10"> 
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">📅 Citas Médicas por Atender</h2> 
+    <div *ngIf="citasPorAtender.length === 0" class="text-gray-500 italic">No hay citas programadas aún.</div> 
+    <div *ngFor="let cita of citasPorAtender" class="bg-white shadow rounded-xl p-4 mb-4 border-l-4 border-purple-500"> 
+      <p class="text-lg font-semibold text-purple-700">{{ cita.paciente }}</p> 
+      <p class="text-gray-700">🩺 {{ cita.especialidad }}</p> 
+      <p class="text-gray-600">📆 Día: {{ cita.dia }}</p> 
+      <p class="text-gray-600">⏰ Hora: {{ cita.hora }}</p> 
+    </div> 
+  </section>
+
+  <!-- Calendario Julio -->
+  <div class="bg-white p-4 rounded-lg shadow mb-6">
+    <h2 class="text-xl font-semibold text-purple-700 mb-4">Julio</h2>
+    <div class="grid grid-cols-7 gap-2 text-center text-sm">
+      <div class="font-bold text-gray-700" *ngFor="let d of diasSemana">{{ d }}</div>
+      <ng-container *ngFor="let espacio of espaciosInicio">
+        <div></div>
+      </ng-container>
+      <div *ngFor="let day of diasJulio"
+           (click)="seleccionarDia(day)"
+           [ngClass]="{
+              'bg-green-300 text-white font-semibold': tieneHorario(day),
+              'bg-purple-200 text-purple-800': !tieneHorario(day)
+            }"
+           class="p-2 rounded-lg cursor-pointer hover:bg-purple-400 transition">
+        {{ day }}
+      </div>
     </div>
   </div>
 
-  <!-- Botón de editar horario -->
-  <div class="text-right mb-4">
-    <button (click)="modoEdicion = !modoEdicion"
-      class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition">
-      {{ modoEdicion ? 'Bloquear Edición' : 'Editar Horario' }}
-    </button>
-  </div>
-
-  <!-- Tabla de Horario -->
-  <div class="overflow-auto">
-    <table class="min-w-full text-sm text-center border border-gray-300">
-      <thead class="bg-purple-200 text-gray-800">
+  <!-- Selector de horarios -->
+  <div *ngIf="diaSeleccionado" class="bg-white p-4 rounded-lg shadow mb-6">
+    <h3 class="text-lg font-semibold text-purple-700 mb-4">Horarios para el día {{ diaSeleccionado }} de Julio</h3>
+    <table class="w-full text-sm text-center border">
+      <thead class="bg-purple-200">
         <tr>
-          <th class="border px-2 py-1">Hora / Día</th>
-          <th *ngFor="let dia of dias" class="border px-2 py-1">
-            {{ dia }}
-            <div class="flex flex-col mt-1 space-y-1">
-              <button (click)="seleccionarTodo(dia)" [disabled]="!modoEdicion"
-                class="text-xs bg-green-500 text-white px-1 py-0.5 rounded">Seleccionar todo</button>
-              <button (click)="limpiarDia(dia)" [disabled]="!modoEdicion"
-                class="text-xs bg-red-500 text-white px-1 py-0.5 rounded">Limpiar</button>
-            </div>
-          </th>
+          <th class="p-2 border">Horario</th>
+          <th class="p-2 border">Disponible</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let hora of horas" class="even:bg-gray-50">
-          <td class="border px-2 py-1 font-semibold text-left pl-4">{{ hora }}</td>
-          <td *ngFor="let dia of dias" class="border px-2 py-1">
-            <input type="checkbox" [(ngModel)]="horarioSeleccionado[dia][hora]" [disabled]="!modoEdicion" />
+        <tr *ngFor="let hora of horariosMediaHora">
+          <td class="p-2 border text-left pl-4">{{ hora }}</td>
+          <td class="p-2 border">
+            <input type="checkbox"
+                   [(ngModel)]="horarioSeleccionado[diaSeleccionado][hora]"
+                   (change)="actualizarAlCambiarCheckbox(diaSeleccionado, hora)"
+                   class="accent-green-500">
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <!-- Botones generales -->
-  <div class="mt-6 text-center">
-    <button (click)="guardarHorarioGeneral()" [disabled]="!modoEdicion"
-      class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition">
-      Guardar Horario General
+  <div class="text-center mt-4">
+    <button (click)="guardarHorarios()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition">
+      Guardar Horarios
+    </button>
+  </div>
+  <!-- Modal de confirmación -->
+  <div *ngIf="mostrarModal" class="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-black/30 z-50">
+    <div class="bg-white p-6 rounded-xl shadow-xl text-center max-w-md w-full border-2 border-purple-500">
+      <h2 class="text-xl font-semibold text-purple-700 mb-4">✅ Citas guardadas correctamente para este mes</h2>
+      <button (click)="cerrarModal()"
+        class="mt-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition">
+        Cerrar
+      </button>
+    </div>
+  </div>
+  <div class="mt-12 text-center">
+    <button (click)="cerrarSesion()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">
+    Cerrar sesión
     </button>
   </div>
 
-  <div class="mt-4 text-center">
-    <button (click)="resetHorario()" [disabled]="!modoEdicion"
-      class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-semibold transition">
-      Reiniciar Todo el Horario
-    </button>
-  </div>
-  <div class="mt-12 text-center">
-  <a routerLink="/home"
-     class="inline-block px-6 py-3 bg-[#5B4892] text-white text-lg font-semibold rounded-xl shadow-md hover:bg-purple-800 transition duration-300">
-    Volver a la Página Principal
-  </a>
-</div>
 </div>
 
