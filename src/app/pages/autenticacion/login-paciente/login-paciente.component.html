@@ -1,15 +1,47 @@
 <div class="relative min-h-screen bg-gradient-to-br from-purple-200 to-purple-400 flex items-center justify-center px-4">
   <div class="absolute top-6 right-6">
-  <a href="/" class="bg-white text-[#5B4892] font-semibold px-4 py-2 rounded-xl shadow hover:bg-gray-100 transition duration-300">
-    ← Regresar a inicio
-  </a>
-</div>
+    <a href="/" class="bg-white text-[#5B4892] font-semibold px-4 py-2 rounded-xl shadow hover:bg-gray-100 transition duration-300">
+      ← Regresar a inicio
+    </a>
+  </div>
   <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
     <h2 class="text-3xl font-bold text-center text-[#5B4892] mb-6">
       {{ modoRegistro ? 'Registrarse' : 'Iniciar Sesión' }}
     </h2>
-
     <form (ngSubmit)="modoRegistro ? registrar() : login()" class="space-y-4">
+      <div *ngIf="modoRegistro">
+        <div class="mb-2">
+          <label for="nombre" class="block text-gray-700 font-semibold mb-1">Nombre</label>
+          <input
+            type="text" id="nombre" name="nombre"
+            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5B4892]"
+          />
+        </div>
+
+        <div class="mb-2">
+          <label for="apellido" class="block text-gray-700 font-semibold mb-1">Apellido</label>
+          <input
+            type="text" id="apellido" name="apellido"
+            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5B4892]"
+          />
+        </div>
+
+        <div class="mb-2">
+          <label for="dni" class="block text-gray-700 font-semibold mb-1">DNI</label>
+          <input
+            type="text" id="dni" name="dni"
+            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5B4892]"
+          />
+        </div>
+
+        <div class="mb-2">
+          <label for="telefono" class="block text-gray-700 font-semibold mb-1">Teléfono</label>
+          <input
+            type="text" id="telefono" name="telefono"
+            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5B4892]"
+          />
+        </div>
+      </div>
 
       <div>
         <label for="email" class="block text-gray-700 font-semibold mb-1">Correo electrónico</label>
