@@ -10,7 +10,8 @@ import { CommonModule } from '@angular/common';
 })
 export class DashBoardPacienteComponent implements OnInit {
   
-  
+  espaciosInicioJulio: undefined[] = [];
+
   especialidades = [
     { nombre: 'Cardiología', doctores: ['Dr. Felipe Quispe'] },
     { nombre: 'Pediatría', doctores: ['Dra. Ana Torres'] },
@@ -76,55 +77,26 @@ export class DashBoardPacienteComponent implements OnInit {
   seleccionarDoctor(nombre: string) {
     this.doctorSeleccionado = nombre;
 
-    const disponibilidad = {
-      'Dr. Felipe Quispe': {
-        dias: ['2025-07-10', '2025-07-14', '2025-07-20'],
-        horarios: ['09:00 - 09:30', '10:30 - 11:00', '16:00 - 16:30']
-      },
-      'Dra. Ana Torres': {
-        dias: ['2025-07-11', '2025-07-15', '2025-07-18'],
-        horarios: ['09:00 - 09:30', '10:30 - 11:00', '16:00 - 16:30']
-      },
-      'Dr. Beto Suárez': {
-        dias: ['2025-07-12', '2025-07-17', '2025-07-25'],
-        horarios: ['09:00 - 09:30', '10:30 - 11:00', '16:00 - 16:30']
-      },
-      'Dr. Carlos Mendoza': {
-        dias: ['2025-07-13', '2025-07-17', '2025-07-22'],
-        horarios: ['09:00 - 09:30', '10:30 - 11:00', '16:00 - 16:30']
-      },
-      'Dra. Diana López': {
-        dias: ['2025-07-14', '2025-07-10', '2025-07-16'],
-        horarios: ['09:00 - 09:30', '10:30 - 11:00', '16:00 - 16:30']
-      },
-      'Dra. Elena Chávez': {
-        dias: ['2025-07-15', '2025-07-17', '2025-07-20'],
-        horarios: ['09:00 - 09:30', '10:30 - 11:00', '16:00 - 16:30']
-      },
-      'Dr. Rolando Soriano': {
-        dias: ['2025-07-16', '2025-07-08', '2025-07-19'],
-        horarios: ['09:00 - 09:30', '10:30 - 11:00', '16:00 - 16:30']
-      },
-      'Dr. Jorge Herrera': {
-        dias: ['2025-07-17', '2025-07-18', '2025-07-19'],
-        horarios: ['09:00 - 09:30', '10:30 - 11:00', '16:00 - 16:30']
-      },
-      'Dr. Ariano Cuellar': {
-        dias: ['2025-07-18', '2025-07-19', '2025-07-20'],
-        horarios: ['09:00 - 09:30', '10:30 - 11:00', '16:00 - 16:30']
-      },
-      'Dr. Aldo Alanya': {
-        dias: ['2025-07-19', '2025-07-11', '2025-07-09'],
-        horarios: ['09:00 - 09:30', '10:30 - 11:00', '16:00 - 16:30']
-      },
-      'Dr. Edson Sosa': {
-        dias: ['2025-07-20', '2025-07-28', '2025-07-25'],
-        horarios: ['09:00 - 09:30', '10:30 - 11:00', '16:00 - 16:30']
-      }
-    }as const;
+    const data = localStorage.getItem(`horarioDoctorJulio_${nombre}`);
+  if (data) {
+    const disponibilidad = JSON.parse(data);
+    this.diasDisponibles = Object.keys(disponibilidad).filter(dia => {
+      return Object.values(disponibilidad[dia]).some(h => h);
+    }).map(d => `2025-07-${d.toString().padStart(2, '0')}`);
 
-    this.diasDisponibles = (disponibilidad as any) [nombre].dias;
-    this.horarios = (disponibilidad as any)[nombre].horarios;
+    this.horarios = Array.from(
+      new Set(
+        this.diasDisponibles.flatMap(dia => {
+          const diaNum = Number(dia.split('-')[2]);
+          const horariosDia = disponibilidad[diaNum];
+          return Object.keys(horariosDia).filter(h => horariosDia[h]);
+        })
+      )
+    );
+  } else {
+    this.diasDisponibles = [];
+    this.horarios = [];
+  }
     this.diaSeleccionado = '';
     this.horariosReservados = [];
     
