@@ -19,8 +19,14 @@ export class LoginDoctoresComponent {
   { usuario: 'felipe', password: '12345', nombre: 'Dr. Felipe Quispe' },
   { usuario: 'ariano', password: '11111', nombre: 'Dr. Ariano Cuellar' },
   { usuario: 'edson', password: '22222', nombre: 'Dr. Edson Sosa' },
-  
-  
+  { usuario: 'carlos', password: '33333', nombre: 'Dr. Carlos Mendoza' },
+  { usuario: 'diana', password: '44444', nombre: 'Dra. Diana López' },
+  { usuario: 'elena', password: '55555', nombre: 'Dra. Elena Chávez' },
+  { usuario: 'rolando', password: '66666', nombre: 'Dr. Rolando Soriano' },
+  { usuario: 'jorge', password: '77777', nombre: 'Dr. Jorge Herrera' },
+  { usuario: 'aldo', password: '88888', nombre: 'Dr. Aldo Alanya' },
+  { usuario: 'ana', password: '99999', nombre: 'Dra. Ana Torres' },
+  { usuario: 'beto', password: '54321', nombre: 'Dr. Beto Suárez' }
 ];
 
 constructor(private router: Router) {}
