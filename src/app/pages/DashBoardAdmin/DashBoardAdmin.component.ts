@@ -24,7 +24,7 @@ export class DashBoardAdminComponent implements OnInit {
 
   seleccionarUsuario(email: string) {
     if (this.usuarioSeleccionado === email) {
-      // cerrar si ya está abierto
+      
       this.usuarioSeleccionado = null;
       this.citasSeleccionadas = [];
     } else {
@@ -40,4 +40,27 @@ export class DashBoardAdminComponent implements OnInit {
       localStorage.setItem(`citas_${this.usuarioSeleccionado}`, JSON.stringify(this.citasSeleccionadas));
     }
   }
+
+  cerrarSesion() {
+  window.location.href = '/login-admin';
+}
+
+eliminarUsuario(email: string) {
+  
+  this.usuarios = this.usuarios.filter(u => u.email !== email);
+
+  
+  localStorage.removeItem(`citas_${email}`);
+
+  
+  const usuariosGuardados = JSON.parse(localStorage.getItem('usuariosRegistrados') || '[]');
+  const nuevosUsuarios = usuariosGuardados.filter((u: any) => u.email !== email);
+  localStorage.setItem('usuariosRegistrados', JSON.stringify(nuevosUsuarios));
+
+  
+  if (this.usuarioSeleccionado === email) {
+    this.usuarioSeleccionado = null;
+    this.citasSeleccionadas = [];
+  }
+}
 }
